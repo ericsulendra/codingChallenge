@@ -9,7 +9,6 @@ namespace CodingChallenge.Data
     {
         private List<Product> products {get;set;}
         private List<Package> packages {get;set;}
-
         private string filePath;
 
         public FileProductStore(string filePath)

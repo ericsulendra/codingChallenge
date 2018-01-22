@@ -136,43 +136,6 @@ namespace CodingChallenge.Models
             {
                 return orderItems.Sum(i => i.TotalPrice);
             }
-        }
-        
-        public void FulfillOrder(int quantity, int packSize, string productCode, decimal packPrice)
-        {
-            var existingItem = orderItems.Find(item => item.ProductCode == productCode && item.PackSize == packSize);
-            if(existingItem != null)
-            {
-                existingItem.Quantity += quantity;
-            }
-            else
-            {
-                orderItems.Add(new OrderItem{
-                    ProductCode = productCode,
-                    Quantity = quantity,
-                    PackSize = packSize,
-                    PackPrice = packPrice
-                });
-            }
-        }
-        
-        public void RemoveItem(int quantityToRemove, int packSize, string productCode)
-        {
-            for(var c = 0; c < quantityToRemove; c++)
-            {
-                var itemToRemove = orderItems.Find(item => item.ProductCode == productCode && item.PackSize == packSize);
-                if(itemToRemove != null)
-                {
-                    if(quantityToRemove >= itemToRemove.Quantity)
-                    {
-                        orderItems.Remove(itemToRemove);
-                    }
-                    else
-                    {
-                        itemToRemove.Quantity -= quantityToRemove;
-                    }
-                }
-            }
-        }
+        }        
     }
 }
