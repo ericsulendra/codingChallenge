@@ -12,15 +12,15 @@ The executables takes in two files as argument, the first one is file for orders
 
 To run the project inside Code:
 
-    These commands should be run when opening the solution for the first time in Code:
-   >   dotnet restore
-	    dotnet build CodingChallenge.sln
+These commands should be run when opening the solution for the first time in Code:
+> dotnet restore  
+dotnet build CodingChallenge.sln
 	
-	Use this command to run the solution in Code
-   >   dotnet run --project Bakery/Bakery.csproj Bakery/inputFiles/input Bakery/inputFiles/product-pack
+Use this command to run the solution in Code
+> dotnet run --project Bakery/Bakery.csproj Bakery/inputFiles/input Bakery/inputFiles/product-pack
 
-    To run test in Code
-   >   dotnet test Tests/Tests.csproj
+To run test in Code
+> dotnet test Tests/Tests.csproj
      
 C# extension has a nice support to run/debug unit tests via CodeLens annotations above the test methods.
 
