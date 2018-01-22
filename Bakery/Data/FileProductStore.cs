@@ -71,7 +71,7 @@ namespace CodingChallenge.Data
                         if(splitPackArray.Length == 3)
                         {
                             var package = new Package {
-                                Quantity = int.Parse(splitPackArray[0]),
+                                PackSize = int.Parse(splitPackArray[0]),
                                 ProductCode = splitPackArray[1],
                                 UnitPrice = decimal.Parse(splitPackArray[2])
                             };

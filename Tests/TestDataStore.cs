@@ -6,23 +6,23 @@ namespace Tests.DataStore
 
     public class TestDataStore : IProductStore
     {
-        List<Package> IProductStore.GetPackages()
+        public List<Package> GetPackages()
         {
             var packages = new List<Package>();
             packages.Add(new Package {
                 UnitPrice = 6.99m,
-                Quantity = 3,
+                PackSize = 3,
                 ProductCode = "VS5"
             });
             packages.Add(new Package {
                 UnitPrice = 8.99m,
-                Quantity = 5,
+                PackSize = 5,
                 ProductCode = "VS5"
             });
             return packages;
         }
 
-        List<Product> IProductStore.GetProducts()
+        public List<Product> GetProducts()
         {
             throw new System.NotImplementedException();
         }

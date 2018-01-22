@@ -25,17 +25,17 @@ namespace CodingChallenge.Models
             var packages = productStore.GetPackages();
             if(packages.Any(p => p.ProductCode == productCode))
             {
-                var foundProducts = packages.Where(p => p.ProductCode == productCode).OrderBy(p => p.Quantity).ToList();
+                var foundProducts = packages.Where(p => p.ProductCode == productCode).OrderBy(p => p.PackSize).ToList();
                 
                 // Check that requested quantity satisfies minimum quantity in pack
                 // to be able to fulfill order
-                if(requestQty < foundProducts.Min(p => p.Quantity))
+                if(requestQty < foundProducts.Min(p => p.PackSize))
                 {
-                    throw new OrderException(string.Format("Cannot fulfill order at this time. Minimum order is pack of {0}.", foundProducts.Min(p => p.Quantity)));
+                    throw new OrderException(string.Format("Cannot fulfill order at this time. Minimum order is pack of {0}.", foundProducts.Min(p => p.PackSize)));
                 }
 
-                var maxPackSize = foundProducts.Max(p => p.Quantity);
-                var minPackSize = foundProducts.Min(p => p.Quantity);
+                var maxPackSize = foundProducts.Max(p => p.PackSize);
+                var minPackSize = foundProducts.Min(p => p.PackSize);
 
                 while(requestQty > 0)
                 {  
@@ -51,26 +51,26 @@ namespace CodingChallenge.Models
                     {
                         var product = foundProducts[productIndex];
 
-                        if(product.Quantity > requestQty)
+                        if(product.PackSize > requestQty)
                         {
                             productIndex--;
                             continue;
                         }
 
-                        var remainder = requestQty % product.Quantity;
+                        var remainder = requestQty % product.PackSize;
                         
                         if(remainder == 0)
                         {
-                            FulfillOrder(requestQty / product.Quantity, product.Quantity, product.ProductCode, product.UnitPrice);
+                            FulfillOrder(requestQty / product.PackSize, product.PackSize, product.ProductCode, product.UnitPrice);
                             requestQty = 0;
                             break;
                         }
                         else
                         {
-                            var packCount = (int)Math.Floor((decimal)requestQty / product.Quantity);
+                            var packCount = (int)Math.Floor((decimal)requestQty / product.PackSize);
 
-                            FulfillOrder(packCount, product.Quantity, product.ProductCode, product.UnitPrice);
-                            requestQty -= product.Quantity * packCount;
+                            FulfillOrder(packCount, product.PackSize, product.ProductCode, product.UnitPrice);
+                            requestQty -= product.PackSize * packCount;
                             productIndex--;
                         }
                     }
