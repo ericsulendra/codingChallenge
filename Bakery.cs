@@ -4,152 +4,26 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Models;
+    using CodingChallenge.Models;
+    using CodingChallenge.Data;
 
-    class Package : Product
-    {
-        public int Quantity { get;set; }        
-    }
-
-    class OrderItem
-    {
-        public int Quantity { get;set; }
-        public string ProductCode { get;set; }
-        public decimal TotalPrice { get;set; }
-
-        public override string ToString()
+    public class Bakery
+    {       
+        public static void Main(string[] args)
         {
-            return string.Format("{0} {1} {2}", Quantity, ProductCode, TotalPrice);
-        }
-    }
-
-    class Order
-    {
-        private List<OrderItem> orderItems { get;set; }
-        public Order()
-        {
-            orderItems = new List<OrderItem>();
-        }
-
-        public void FulfillOrder(int quantity, int packSize, string productCode, decimal packPrice)
-        {
-            for(var c = 0; c < quantity; c++)
+            if(!args.Any() || args.Length != 2)
             {
-                orderItems.Add(new OrderItem{
-                    ProductCode = productCode,
-                    Quantity = packSize,
-                    TotalPrice = packPrice
-                });
-            }
-        }
-        
-        public void RemoveItem(int quantity, int packSize, string productCode)
-        {
-            for(var c = 0; c < quantity; c++)
-            {
-                var itemToRemove = orderItems.Find(item => item.ProductCode == productCode && item.Quantity == packSize);
-                if(itemToRemove != null)
-                {
-                    orderItems.Remove(itemToRemove);
-                }
-            }
-        }
-
-        public List<OrderItem> GetPackedItems()
-        {
-            var items = (from i in orderItems
-                        group i by i.Quantity                        
-                        into g
-                        select new OrderItem
-                        {
-                            Quantity = g.Sum(p => p.Quantity),
-                            TotalPrice = g.Sum(p => p.TotalPrice),
-                            ProductCode = g.First().ProductCode                            
-                        }).ToList();
-            return items;
-        }
-    }
-
-    class Initialize
-    {
-        public void ReadProductFile(string path)
-        {
-
-        }
-    }
-
-    public class Program
-    { 
-        static void Main(string[] args)
-        {
-
-            var products = new List<Package>();
-            products.Add(new Package{
-                ProductCode = "VS5",
-                ProductName = "Vegemite Scroll",
-                UnitPrice = 6.99m,
-                Quantity = 3                
-            });
-            products.Add(new Package{
-                ProductCode = "VS5",
-                ProductName = "Vegemite Scroll",
-                UnitPrice = 8.99m,
-                Quantity = 5                
-            });
-
-            products.Add(new Package{
-                ProductCode = "MB11",
-                ProductName = "Blueberry Muffin",
-                UnitPrice = 9.95m,
-                Quantity = 2
-            });
-            products.Add(new Package{
-                ProductCode = "MB11",
-                ProductName = "Blueberry Muffin",
-                UnitPrice = 16.95m,
-                Quantity = 5
-            });
-            products.Add(new Package{
-                ProductCode = "MB11",
-                ProductName = "Blueberry Muffin",
-                UnitPrice = 24.95m,
-                Quantity = 8
-            });
-
-            products.Add(new Package{
-                ProductCode = "CF",
-                ProductName = "Croissant",
-                UnitPrice = 5.95m,
-                Quantity = 3
-            });
-            products.Add(new Package{
-                ProductCode = "CF",
-                ProductName = "Croissant",
-                UnitPrice = 9.95m,
-                Quantity = 5
-            });
-             products.Add(new Package{
-                ProductCode = "CF",
-                ProductName = "Croissant",
-                UnitPrice = 13.99m,
-                Quantity = 7
-            });
-            products.Add(new Package{
-                ProductCode = "CF",
-                ProductName = "Croissant",
-                UnitPrice = 16.99m,
-                Quantity = 9
-            });
-
-            if(!args.Any())
-            {
-                Console.WriteLine("please specify input data");
+                Console.WriteLine("please specify input data with <order-file> <product-file> arguments");
                 Console.ReadKey();
             }
             else
             {
                 try
-                {
+                {                    
+                    var productStore = new FileProductStore(args[1]);
+                    var products = new List<Package>();
+                    products = productStore.GetPackages();
+
                     using(var inputFile = File.OpenText(args[0]))
                     {
                         string line;
