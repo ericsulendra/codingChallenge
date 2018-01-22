@@ -21,60 +21,102 @@ namespace CodingChallenge.Models
         // Process a new order with a given product code and request quantity
         public void ProcessOrder(string productCode, int requestQty)
         {
+            // reset values
             orderItems.Clear();
+            UnfulfilledQuantity = 0;
+            IsOrderComplete = false;
+            var qtyLeft = requestQty;
+            var productCursor = 0;
             var packages = productStore.GetPackages();
+
             if(packages.Any(p => p.ProductCode == productCode))
             {
-                var foundProducts = packages.Where(p => p.ProductCode == productCode).OrderBy(p => p.PackSize).ToList();
+                // Largest pack first for backtracking later.
+                var foundPackages = packages.Where(p => p.ProductCode == productCode).OrderByDescending(p => p.PackSize).ToList();
                 
                 // Check that requested quantity satisfies minimum quantity in pack
                 // to be able to fulfill order
-                if(requestQty < foundProducts.Min(p => p.PackSize))
+                if(requestQty < foundPackages.Min(p => p.PackSize))
                 {
-                    throw new OrderException(string.Format("Cannot fulfill order at this time. Minimum order is pack of {0}.", foundProducts.Min(p => p.PackSize)));
+                    throw new OrderException(string.Format("Cannot fulfill order at this time. Minimum order is pack of {0}.", foundPackages.Min(p => p.PackSize)));
                 }
 
-                var maxPackSize = foundProducts.Max(p => p.PackSize);
-                var minPackSize = foundProducts.Min(p => p.PackSize);
+                // initialize order items with 0 quantity for all possible packages to start
+                foreach(var package in foundPackages)
+                {
+                    orderItems.Add(
+                        new OrderItem () {
+                            ProductCode = package.ProductCode,
+                            PackPrice = package.UnitPrice,
+                            PackSize = package.PackSize,
+                            Quantity = 0
+                        });
+                }
 
-                while(requestQty > 0)
-                {  
-                    int passIndex = foundProducts.Count - 1;
-                    int productIndex = foundProducts.Count - 1;
-                    if(requestQty < minPackSize)
+                while(qtyLeft != 0)
+                {
+                    // Check for quick ones
+                    // Since it is checking from largest pack first, it ensures least number of packs used
+                    for (var index = productCursor; index < orderItems.Count; index++)                
                     {
-                        UnfulfilledQuantity = requestQty;
-                        IsOrderComplete = false;
-                        break;
-                    }
-                    while (productIndex >= 0)                                      
-                    {
-                        var product = foundProducts[productIndex];
-
-                        if(product.PackSize > requestQty)
-                        {
-                            productIndex--;
-                            continue;
-                        }
-
-                        var remainder = requestQty % product.PackSize;
-                        
+                        var item = orderItems[index];
+                        var remainder = qtyLeft % item.PackSize;
                         if(remainder == 0)
                         {
-                            FulfillOrder(requestQty / product.PackSize, product.PackSize, product.ProductCode, product.UnitPrice);
-                            requestQty = 0;
-                            break;
+                            item.Quantity += qtyLeft / item.PackSize; 
+                            qtyLeft -= qtyLeft;
+                            break;                      
                         }
-                        else
+                        else 
                         {
-                            var packCount = (int)Math.Floor((decimal)requestQty / product.PackSize);
+                            item.Quantity += (qtyLeft - remainder) / item.PackSize;
+                            qtyLeft = qtyLeft - (item.Quantity * item.PackSize);
 
-                            FulfillOrder(packCount, product.PackSize, product.ProductCode, product.UnitPrice);
-                            requestQty -= product.PackSize * packCount;
-                            productIndex--;
+                            // Remainder can't be fulfilled. Need to backtrack
+                            if(item == orderItems.Last() && qtyLeft < item.PackSize)
+                            {
+                                // Tried smallest pack size and still can't fulfill order then it is impossible
+                                // Need to break and record the remaining qty
+                                if(productCursor == orderItems.Count - 1 &&
+                                    orderItems.Take(orderItems.Count - 1).All(p => p.Quantity == 0))
+                                {
+                                    UnfulfilledQuantity = qtyLeft;
+                                    qtyLeft = 0;
+                                    break;
+                                }    
+
+                                // Remove the biggest filled pack size item first and try to fill it up again.
+                                // set cursor forward to skip the larger pack size
+                                var maxPackSizeItem = orderItems.LastOrDefault(p => p.Quantity != 0 && p != orderItems.Last());
+                                if(maxPackSizeItem != null)
+                                {
+                                    maxPackSizeItem.Quantity -= 1;
+                                    qtyLeft += maxPackSizeItem.PackSize;
+                                    if(productCursor != orderItems.Count - 1)
+                                    {                                        
+                                        productCursor++;
+                                    }
+                                }
+                                else 
+                                {
+                                    // smallest pack and unable to fulfill order.
+                                    // terminate early
+                                    UnfulfilledQuantity = qtyLeft;
+                                    qtyLeft = 0;
+                                    break;
+                                }
+                            }
                         }
                     }
-                }    
+                }
+
+                if(UnfulfilledQuantity == 0)
+                {
+                    IsOrderComplete = true;
+                }
+
+                // Remove unneeded packs
+                orderItems.RemoveAll(p => p.Quantity == 0);
             }
             else
             {
@@ -86,6 +128,14 @@ namespace CodingChallenge.Models
         public List<OrderItem> GetOrderSummary()
         {
             return orderItems;
+        }
+
+        public decimal TotalPrice 
+        {
+            get 
+            {
+                return orderItems.Sum(i => i.TotalPrice);
+            }
         }
         
         public void FulfillOrder(int quantity, int packSize, string productCode, decimal packPrice)

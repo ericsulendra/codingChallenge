@@ -20,7 +20,7 @@ To run the project inside Code:
    >   dotnet run --project Bakery/Bakery.csproj Bakery/inputFiles/input Bakery/inputFiles/product-pack
 
     To run test in Code
-   >   dotnet test --project Tests/Tests.csproj
+   >   dotnet test Tests/Tests.csproj
      
 C# extension has a nice support to run/debug unit tests via CodeLens annotations above the test methods.
 

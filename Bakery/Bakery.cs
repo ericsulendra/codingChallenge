@@ -56,7 +56,8 @@
                                     
                                     // print fullfilled order                                        
                                     var items = order.GetOrderSummary();
-                                    items.ForEach(item => Console.WriteLine(item));       
+                                    items.ForEach(item => Console.WriteLine(item));
+                                    Console.WriteLine();
 
                                     if(!order.IsOrderComplete && order.UnfulfilledQuantity > 0)
                                     {

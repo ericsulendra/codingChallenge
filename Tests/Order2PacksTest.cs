@@ -1,13 +1,13 @@
-namespace Tests
+namespace CodingChallenge.Tests
 {
     using System.Collections.Generic;
     using System.Linq;
     using CodingChallenge.Models;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Tests.DataStore;
+    using CodingChallenge.Tests.DataStore;
 
     [TestClass]
-    public class OrderTest
+    public class Order2PacksTest
     {
         [TestMethod]
         public void Can_Fulfill_20_VS5_Order_test()
@@ -21,6 +21,7 @@ namespace Tests
             Assert.IsTrue(totalSize == 20);
             Assert.AreEqual(0, order.UnfulfilledQuantity);
             Assert.IsTrue(order.IsOrderComplete);
+            Assert.AreEqual(35.96m, order.TotalPrice);
         }
 
         [TestMethod]
@@ -33,6 +34,7 @@ namespace Tests
             var items = order.GetOrderSummary();
             var totalSize = items.Sum(i => i.Quantity * i.PackSize);
             Assert.IsTrue(totalSize == 3);
+            Assert.AreEqual(6.99m, order.TotalPrice);
         }
         
         [TestMethod]
@@ -47,6 +49,7 @@ namespace Tests
             Assert.IsTrue(totalSize == 6);
             Assert.AreEqual(1, order.UnfulfilledQuantity);
             Assert.IsFalse(order.IsOrderComplete);
+            Assert.AreEqual(13.98m, order.TotalPrice);
         }
 
         [TestMethod]
@@ -54,32 +57,11 @@ namespace Tests
         {
             var dataStore = new TestDataStore();
             var order = new Order(dataStore);
-
-            var packages = dataStore.GetPackages();
-            var qty = 14;
-            var code = "VS5";
-
-            var orderPackages = packages.Where(p => p.ProductCode == code).OrderByDescending(p => p.PackSize).ToList();
-
-            // Need to keep track of state
-            // initialize order items with 0 quantity for all possible packages
-            var tempOrderItems = new List<OrderItem>();
-            foreach(var package in orderPackages)
-            {
-                tempOrderItems.Add(
-                    new OrderItem () {
-                        ProductCode = package.ProductCode,
-                        PackPrice = package.UnitPrice,
-                        PackSize = package.PackSize,
-                        Quantity = 0
-                    });
-            }
-
-
-            //order.ProcessOrder("VS5", 12);
-            // var items = order.GetOrderSummary();
-            // var totalSize = items.Sum(i => i.Quantity * i.PackSize);
-            // Assert.IsTrue(totalSize == 12);
+            order.ProcessOrder("VS5", 12);
+            var items = order.GetOrderSummary();
+            var totalSize = items.Sum(i => i.Quantity * i.PackSize);
+            Assert.IsTrue(totalSize == 12);
+            Assert.AreEqual(27.96m, order.TotalPrice);
         }
     }
 }

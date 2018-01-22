@@ -48,7 +48,7 @@ namespace CodingChallenge.Models
 
         public override string ToString()
         {
-            return string.Format("{0} {1} {2}", _quantity * PackSize, ProductCode, TotalPrice);
+            return string.Format("{0} x {1} {2} {3}", _quantity, PackSize, ProductCode, TotalPrice);
         }
     }
 }
