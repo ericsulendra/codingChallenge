@@ -18,8 +18,10 @@ namespace Tests
             var items = order.GetOrderSummary();
             var totalSize = items.Sum(i => i.Quantity * i.PackSize);
             Assert.IsTrue(totalSize == 20);
+            Assert.AreEqual(0, order.UnfulfilledQuantity);
+            Assert.IsTrue(order.IsOrderComplete);
         }
-        
+
         [TestMethod]
         public void Cannot_Fulfill_4_VS5_Order_test()
         {
@@ -42,6 +44,8 @@ namespace Tests
             var items = order.GetOrderSummary();
             var totalSize = items.Sum(i => i.Quantity * i.PackSize);
             Assert.IsTrue(totalSize == 6);
+            Assert.AreEqual(1, order.UnfulfilledQuantity);
+            Assert.IsFalse(order.IsOrderComplete);
         }
 
         [TestMethod]

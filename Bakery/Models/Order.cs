@@ -10,6 +10,8 @@ namespace CodingChallenge.Models
     {
         private List<OrderItem> orderItems { get;set; }
         private IProductStore productStore { get;set; }
+        public bool IsOrderComplete { get;set; }
+        public int UnfulfilledQuantity { get; set; } 
         public Order(IProductStore productStore)
         {
             orderItems = new List<OrderItem>();
@@ -41,7 +43,8 @@ namespace CodingChallenge.Models
                     int productIndex = foundProducts.Count - 1;
                     if(requestQty < minPackSize)
                     {
-                        FulfillOrder(1, requestQty, productCode, 2.5m);
+                        UnfulfilledQuantity = requestQty;
+                        IsOrderComplete = false;
                         break;
                     }
                     while (productIndex >= 0)                                      
