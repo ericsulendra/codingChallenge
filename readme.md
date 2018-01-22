@@ -14,8 +14,7 @@ To run the project inside Code:
 
 These commands should be run when opening the solution for the first time in Code:
 > dotnet restore  
-dotnet build  
-CodingChallenge.sln
+dotnet build CodingChallenge.sln
 	
 Use this command to run the solution in Code
 > dotnet run --project Bakery/Bakery.csproj Bakery/inputFiles/input Bakery/inputFiles/product-pack
