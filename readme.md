@@ -4,7 +4,7 @@
 ## Prerequisites
 These are the prerequisites to run this solution.
 - Visual Studio Code with C# and NuGet extension
-- .NET Core 1.1
+- .NET Core 1.1 / .NET Framework v4.6
 
 ## Quick Start Guide
 There will be an executables attached besides source code to quickly run and test the project.
