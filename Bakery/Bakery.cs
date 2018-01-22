@@ -57,13 +57,14 @@
                                     // print fullfilled order                                        
                                     var items = order.GetOrderSummary();
                                     items.ForEach(item => Console.WriteLine(item));
-                                    Console.WriteLine();
 
                                     if(!order.IsOrderComplete && order.UnfulfilledQuantity > 0)
                                     {
-                                        Console.WriteLine("System is unable to fulfill order with this remaining quantity {0}. ");
-                                        Console.WriteLine("Please consider to re-order with a different quantity. We are sorry for the inconvenience");
+                                        Console.WriteLine("System is unable to fulfill order with this remaining quantity: {0}. ", order.UnfulfilledQuantity);
+                                        Console.WriteLine("Please re-order with a different quantity. We are sorry for the inconvenience");
                                     }
+                                    
+                                    Console.WriteLine();
                                 }
                             }
                         }
